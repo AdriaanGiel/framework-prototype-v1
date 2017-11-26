@@ -1,0 +1,10 @@
+app/views/*
+app/models/*
+app/controllers/*
+
+!app/views
+!app/models
+!app/controllers
+
+app/migrations/albums.json
+app/migrations/migrations.php

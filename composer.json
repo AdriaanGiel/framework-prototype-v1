@@ -1,0 +1,13 @@
+{
+    "name": "adriaan/framework",
+    "authors": [
+        {
+            "name": "Adriaan Giel",
+            "email": "a3aan_G@live.nl"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {"Homework\\": "app/"}
+    }
+}
