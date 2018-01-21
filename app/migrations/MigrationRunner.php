@@ -26,8 +26,6 @@ class MigrationRunner
            $sql .= $this->setMigration($migration);
        }
 
-       var_dump($sql);
-
        $db->exec($sql);
    }
 
@@ -67,11 +65,11 @@ class MigrationRunner
        switch ($attribute->getType())
        {
            case "string":
-               return "$name VARCHAR(".$attribute->getNum().") NOT NULL,";
+               return "$name VARCHAR(".$attribute->getNum().") {$attribute->getNull()},";
                break;
 
            case "int":
-               return "$name INT(".$attribute->getNum().") NOT NULL,";
+               return "$name INT(".$attribute->getNum().") {$attribute->getNull()},";
                break;
        }
        return "";

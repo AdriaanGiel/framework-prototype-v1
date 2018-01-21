@@ -3,6 +3,7 @@
 namespace Homework\core\routes;
 
 use Homework\core\helpers\Collection;
+use Homework\core\helpers\PostValueCleaner;
 
 class Router extends Collection
 {
@@ -16,6 +17,9 @@ class Router extends Collection
      */
     private $routeType;
 
+
+    private $postValues = [];
+
     /**
      * Router constructor.
      */
@@ -23,6 +27,27 @@ class Router extends Collection
     {
         parent::__construct($routes);
         $this->routeType = $_SERVER['REQUEST_METHOD'];
+
+        if(count($_POST) != 0)
+        {
+            $this->postValues = PostValueCleaner::generate($_POST);
+        }
+    }
+
+    public static function redirect($url = "")
+    {
+        echo"<pre>";
+        var_dump(BASE_URL);
+        echo"<pre>";
+        exit;
+        header("Location: ". BASE_URL . $url,true,301);
+        exit;
+    }
+
+    public static function redirectBack()
+    {
+        header("Location: {$_SERVER["HTTP_REFERER"]}", true, 301);
+        exit;
     }
 
     /**
@@ -42,8 +67,6 @@ class Router extends Collection
         $page = [];
 
         $routeArgument = $this->getPageWithArg($url);
-
-
 
         $url = $routeArgument->url;
 
@@ -72,12 +95,13 @@ class Router extends Collection
 
     private function useCorrectMethod($class,$page,$routeArgument)
     {
-        if(count($routeArgument->arguments) != 0)
+
+        if(count($this->postValues) != 0)
         {
-            return $class->{$page->getMethod()}(...$routeArgument->arguments);
+            $routeArgument->arguments[] = $this->postValues;
         }
 
-        return $class->{$page->getMethod()}();
+        return $class->{$page->getMethod()}(...$routeArgument->arguments);
     }
 
     private function getPageWithArg($url)

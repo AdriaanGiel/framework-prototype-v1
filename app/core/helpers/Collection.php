@@ -3,7 +3,7 @@ namespace Homework\core\helpers;
 
 class Collection
 {
-    private $data = [];
+    protected $data = [];
 
     /**
      * Collection constructor.
@@ -14,7 +14,7 @@ class Collection
         $this->data = $data;
     }
 
-    public function all()
+    public function all():array
     {
         return $this->data;
     }

@@ -8,10 +8,6 @@ use Homework\core\helpers\Collection;
 class Model extends QueryBuilder
 {
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     public static function all()
     {

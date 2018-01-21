@@ -13,7 +13,10 @@ try{
     // Get Album Data
     $albumRawData = file_get_contents(__DIR__. "/albums.json");
 
-
+    \Homework\models\User::create([
+        "username" => "test@test.com",
+        "password" => \Homework\core\helpers\PasswordEncrypt::hash("password")
+    ]);
 
     // Create new Collection
     $albumCollection = new \Homework\core\helpers\Collection(json_decode($albumRawData, true));

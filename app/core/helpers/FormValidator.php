@@ -5,18 +5,34 @@ namespace Homework\core\helpers;
 
 class FormValidator
 {
+    /**
+     * @var array
+     */
     protected $rules = [];
 
+    /**
+     * FormValidator constructor.
+     * @param $rules
+     */
     public function __construct($rules)
     {
         $this->rules = $this->transformRules($rules);
     }
 
+    /**
+     * Static constructor
+     * @param $rules
+     * @return static
+     */
     public static function make($rules)
     {
         return new static($rules);
     }
 
+    /**
+     * Method to validate input
+     * @param $input
+     */
     public function validate($input)
     {
         $errors = $this->checkRules($input);
@@ -27,16 +43,21 @@ class FormValidator
                 "seen" => false
             ];
 
+         FlashData::make($input);
+
          header("Location: create");
          exit;
         }
     }
 
+    /**
+     * Method to return errors in correct format and matching input key
+     * @param $input
+     * @return array
+     */
     private function checkRules($input)
     {
         $validateData = $this->seperateRules();
-
-
         $errors = [];
 
         foreach ($validateData->required->all() as $key => $req){
@@ -65,7 +86,11 @@ class FormValidator
     }
 
 
-
+    /**
+     * Method to get seperate rules for a input
+     * @param $rules
+     * @return Collection
+     */
     private function transformRules($rules)
     {
         $data = new Collection($rules);
@@ -74,6 +99,10 @@ class FormValidator
         });
     }
 
+    /**
+     * Method to filter through all possible rules and return all input data with matching rules
+     * @return object
+     */
     private function seperateRules()
     {
         $required = $this->rules->filter(function ($rule){
@@ -95,16 +124,31 @@ class FormValidator
         ];
     }
 
+    /**
+     * Method to see if input is filled
+     * @param $item
+     * @return bool
+     */
     private function checkRequired($item)
     {
         return $item != "";
     }
 
+    /**
+     * Method to check if input is numeric
+     * @param $item
+     * @return bool
+     */
     private function checkNumeric($item)
     {
         return is_numeric($item);
     }
 
+    /**
+     * Method to check if input is a integer
+     * @param $item
+     * @return bool
+     */
     private function checkInt($item)
     {
         if($this->checkNumeric($item)){

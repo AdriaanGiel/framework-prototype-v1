@@ -2,14 +2,18 @@
 
 namespace Homework\core;
 
-class Controller
+use Homework\core\helpers\FlashData;
+use Homework\core\helpers\Session;
+
+abstract class Controller
 {
     /**
      * Controller constructor.
      */
     public function __construct()
     {
-//        $this->checkFlashData();
+        $this->checkFlashData();
+        FlashData::destroy();
     }
 
     /**
@@ -18,7 +22,17 @@ class Controller
      */
     protected function redirect($url):void
     {
-        header("Location: http://framework.app/" . $url,true,301);
+        header("Location:" . BASE_URL . $url,true,301);
+        exit;
+    }
+
+    protected function redirectBackWithErrors($url,$errors,$inputs =  []):void
+    {
+        FlashData::make($inputs);
+
+        Session::setErrors($errors);
+
+        $this->redirect($url);
     }
 
     /**
@@ -26,17 +40,20 @@ class Controller
      */
     private function checkFlashData():void
     {
-        if(count($_SESSION["errors"]) != 0)
-        {
-            if(!$_SESSION["errors"]["seen"]){
+        if(isset($_SESSION["errors"])){
+            if(count($_SESSION["errors"]) != 0)
+            {
+                if(isset($_SESSION["errors"]["seen"])){
 
-                var_dump("dasda");
-
-                $_SESSION["errors"]["seen"] = true;
-            }else{
-                $_SESSION["errors"] = [];
+                    if(!$_SESSION["errors"]["seen"]){
+                        $_SESSION["errors"]["seen"] = true;
+                    }else{
+                        $_SESSION["errors"] = [];
+                    }
+                }
             }
         }
+
     }
 
 }

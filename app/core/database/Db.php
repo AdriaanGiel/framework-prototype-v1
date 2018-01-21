@@ -4,15 +4,33 @@ namespace Homework\core\database;
 
 class Db
 {
-    protected $db;
+    private $connection;
+    protected static $instance;
+
+    /**
+     * @return \PDO
+     */
+    public function getDbConnection(): \PDO
+    {
+        return $this->connection;
+    }
+
+    public static function getConnection()
+    {
+        if(is_null(static::$instance)){
+            $db = new static();
+            static::$instance = $db->getDbConnection();
+        }
+        return static::$instance;
+    }
 
     /**
      * db constructor.
      * @param $db
      */
-    public function __construct()
+    protected function __construct()
     {
-        $this->db = $GLOBALS["BASE_DB_CONNECTION"];
+        $this->connection = new \PDO("mysql:host=". HOST .";dbname=".DB_NAME,USERNAME,PASSWORD);
     }
 
 }

@@ -4,7 +4,7 @@ namespace Homework\core\database;
 
 use Homework\core\helpers\Collection;
 
-class QueryBuilder extends Db
+class QueryBuilder
 {
     /**
      * @var string
@@ -112,13 +112,7 @@ class QueryBuilder extends Db
            return $object;
        }
        else{
-
-           include __DIR__ . "/../views/header.php";
-
-           include __DIR__ . "/../views/Errors/404.php";
-
-           include __DIR__ . "/../views/footer.php";
-           exit;
+            var_dump('ERROR');
        }
     }
 
@@ -195,8 +189,7 @@ class QueryBuilder extends Db
 
     public function queryBuilder($query,$id = false)
     {
-
-        $this->connection = $this->db->prepare($query);
+        $this->connection = Db::getConnection()->prepare($query);
 
         if(count($this->bind) != 0)
         {
@@ -209,7 +202,7 @@ class QueryBuilder extends Db
 
         if($id)
         {
-            $this->id = $this->db->lastInsertId();
+            $this->id = Db::getConnection()->lastInsertId();
         }
 
         return $this;

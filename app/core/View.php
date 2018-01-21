@@ -16,7 +16,7 @@ class View
      * @param $fileName
      * @param array $vars
      */
-    public function __construct($fileName, $vars = [])
+    public function __construct($fileName, $vars)
     {
         $this->fileName = $fileName;
         $this->vars = $vars;
@@ -24,12 +24,11 @@ class View
         $this->html = file_get_contents(VIEW_PATH . $this->fileName .".php");
     }
 
-    public static function generate(string $name, $vars)
+    public static function generate(string $name, $vars = [])
     {
         $view = new static($name,$vars);
 
         $view->startEngine();
-
 
 //        $view->getHeader();
         echo $view->setView($view->fileName);
@@ -62,7 +61,7 @@ class View
         if(count($parts) != 0)
         {
             $this->html = preg_replace_callback("/{{(.*)}}/",function($echo){
-               return "<?= ". $echo[1] ."?>";
+               return "<?= htmlspecialchars(". strip_tags($echo[1]) .",ENT_QUOTES, 'UTF-8') ?>";
             },$this->html);
 
         }
@@ -101,7 +100,14 @@ class View
                     $this->vars = $this->vars + $param;
                 }
 
-                return file_get_contents(VIEW_PATH . trim($args[0],'"') .".php");
+                $parameters = [];
+                if(isset($param)){
+                    foreach ($param as $key => $p){
+                        $parameters[] = "$" . $key;
+                    }
+                }
+
+                return str_replace('$param',implode(",",$parameters),file_get_contents(VIEW_PATH . trim($args[0],'"') .".php"));
             },$this->html);
 
             $this->generateInclude();
@@ -128,15 +134,17 @@ class View
         preg_match("/@if(.*)/",$this->html,$part);
         if(count($part) != 0)
         {
-
             $this->html = preg_replace_callback("/@if(.*)/",function($target){
                 return "<?php if ". rtrim($target[1]) .": ?>";
+            },$this->html);
+
+            $this->html = preg_replace_callback("/@else/",function($target){
+                return "<?php else : ?>";
             },$this->html);
 
             $this->html = preg_replace_callback("/@endif/",function($target){
                 return "<?php endif; ?>";
             },$this->html);
-
 
         }
     }
@@ -221,7 +229,6 @@ class View
 
         $this->generateInclude();
 
-
         $this->generateEcho();
         $this->generateFor();
         $this->generateForeach();
@@ -229,10 +236,16 @@ class View
         $this->generateIsset();
 
         $this->createAndWriteToFile();
+
         ob_start();
+
         extract($this->vars);
+
         include $this->generatedFile;
+
         $this->html = ob_get_clean();
+
+
         $this->createAndWriteToFile();
         $this->fileName = $this->generatedFile;
 
@@ -240,6 +253,7 @@ class View
 
     private function createAndWriteToFile()
     {
+//        var_dump($this->html);
         $newFile = fopen($this->generatedFile,'w');
         fwrite($newFile,$this->html);
         fclose($newFile);
